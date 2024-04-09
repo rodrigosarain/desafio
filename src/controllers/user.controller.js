@@ -88,9 +88,21 @@ class UserController {
   }
 
   async logout(req, res) {
-    res.clearCookie("jwtToken");
-    console.log("deslogeado gorda");
-    res.redirect("/login");
+    try {
+      res.clearCookie("jwtToken");
+      req.session.destroy((err) => {
+        if (err) {
+          console.error("Error al destruir la sesión:", err);
+          res.status(500).send("Error interno del servidor");
+          return;
+        }
+        console.log("Sesión de usuario destruida correctamente");
+        res.redirect("/login");
+      });
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+      res.status(500).send("Error interno del servidor");
+    }
   }
 
   async admin(req, res) {
