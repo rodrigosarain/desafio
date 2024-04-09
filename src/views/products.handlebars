@@ -1,0 +1,19 @@
+<!-- products.handlebars -->
+{{#if user.login}}
+  <h2>Bienvenido,
+    {{user.first_name}},
+    {{user.last_name}}
+    {{user.email}}</h2>
+{{/if}}
+<a href="/profile/">Profile</a>
+<ul>
+
+  {{#each products}}
+    <div>
+      <h2>{{this.title}}</h2>
+      <p>Precio: {{this.price}}</p>
+      <p>Categoría: {{this.category}}</p>
+      <a href="/products/{{this.id}}">Ver detalles</a>
+    </div>
+  {{/each}}
+</ul>
