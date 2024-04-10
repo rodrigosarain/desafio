@@ -1,5 +1,4 @@
 const ProductModel = require("../models/products.model.js");
-const userController = require("../controllers/user.controller.js");
 
 class ViewsController {
   async renderProducts(req, res) {
