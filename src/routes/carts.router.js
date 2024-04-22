@@ -1,26 +1,22 @@
 const express = require("express");
 const router = express.Router();
 const CartController = require("../controllers/carts.controller.js");
+const authMiddleware = require("../middleware/authmiddleware.js");
 const cartController = new CartController();
+const ViewsController = require("../controllers/views.controller.js");
+const viewsController = new ViewsController();
 
-router.post("/", cartController.createCart.bind(cartController));
-router.get("/:cid", cartController.getCartById.bind(cartController));
-router.post(
-  "/:cid/products/:pid",
-  cartController.addProductToCart.bind(cartController)
-);
-router.delete(
-  "/:cid/products/:pid",
-  cartController.removeProductFromCart.bind(cartController)
-);
-router.put("/:cid", cartController.updateCart.bind(cartController));
-router.put(
-  "/:cid/products/:pid",
-  cartController.updateProductQuantity.bind(cartController)
-);
-router.delete(
-  "/:cid",
-  cartController.removeAllProductsFromCart.bind(cartController)
-);
+router.use(authMiddleware);
+
+router.post("/", cartController.nuevoCarrito);
+router.get("/:cid", cartController.obtenerProductosDeCarrito);
+router.post("/:cid/product/:pid", cartController.agregarProductoEnCarrito);
+router.delete("/:cid/product/:pid", cartController.eliminarProductoDeCarrito);
+router.put("/:cid", cartController.actualizarProductosEnCarrito);
+router.put("/:cid/product/:pid", cartController.actualizarCantidad);
+router.delete("/:cid", cartController.vaciarCarrito);
+router.post("/:cid/purchase", cartController.finalizarCompra);
+
+router.get("/carts/:cid", viewsController.renderCart);
 
 module.exports = router;

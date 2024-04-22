@@ -1,44 +1,36 @@
 const express = require("express");
-const path = require("path");
-const cookieParser = require("cookie-parser");
-const session = require("express-session");
-const MongoStore = require("connect-mongo");
-const passport = require("passport");
+const app = express();
 const exphbs = require("express-handlebars");
-const mongoose = require("mongoose");
-const config = require("./config");
+const cookieParser = require("cookie-parser");
+const passport = require("passport");
+const initializePassport = require("./config/passport.config.js");
+const cors = require("cors");
+const path = require("path");
+const PUERTO = 8080;
+require("./database.js");
 
-//  rutas del enrutador
 const productsRouter = require("./routes/products.router.js");
 const cartsRouter = require("./routes/carts.router.js");
-const userRouter = require("./routes/user.router.js");
 const viewsRouter = require("./routes/views.router.js");
+const userRouter = require("./routes/user.router.js");
 
-const app = express();
-const PUERTO = config.port;
-
-// Middleware
+//Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "../src/public")));
-app.use(cookieParser());
-app.use(
-  session({
-    secret: "secretRecklessLove",
-    resave: true,
-    saveUninitialized: true,
-    store: MongoStore.create({
-      mongoUrl:
-        "mongodb+srv://rodriisaraiin:Pj3SAQwRPORndaJ1@cluster0.gy4hj4r.mongodb.net/e-comerce?retryWrites=true&w=majority&appName=Cluster0",
-      ttl: 100,
-    }),
-  })
-);
+//app.use(express.static("./src/public"));
+app.use(express.static(path.join(__dirname, "public")));
+app.use(cors());
 
+//Passport
 app.use(passport.initialize());
-app.use(passport.session());
+initializePassport();
+app.use(cookieParser());
 
-// Configura el motor de plantillas Handlebars
+//AuthMiddleware
+const authMiddleware = require("./middleware/authmiddleware.js");
+app.use(authMiddleware);
+
+//Handlebars
 const Handlebars = require("handlebars");
 const {
   allowInsecurePrototypeAccess,
@@ -54,7 +46,7 @@ app.engine(
 app.set("view engine", "handlebars");
 app.set("views", path.join(__dirname, "../src/views"));
 
-// Rutas
+//Rutas:
 app.use("/api/products", productsRouter);
 app.use("/api/carts", cartsRouter);
 app.use("/api/users", userRouter);
@@ -63,7 +55,10 @@ app.use("/", viewsRouter);
 const connectToDatabase = require("./database.js");
 connectToDatabase();
 
-// Inicia el servidor
-const server = app.listen(PUERTO, () => {
+const httpServer = app.listen(PUERTO, () => {
   console.log(`Servidor escuchando en el puerto ${PUERTO}`);
 });
+
+///Websockets:
+const SocketManager = require("./sockets/socketm.js");
+new SocketManager(httpServer);

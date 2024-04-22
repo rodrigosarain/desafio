@@ -1,19 +1,30 @@
-<!-- products.handlebars -->
-{{#if user.login}}
-  <h2>Bienvenido,
-    {{this.first_name}},
-    {{user.last_name}}
-    {{user.email}}</h2>
-{{/if}}
-<a href="/profile/">Profile</a>
-<ul>
+<div class="d-flex justify-content-center align-items-center">
+  <h1 class="text-center">Productos</h1>
+  <a href="/carts/{{carritoID}}" class="ms-5">
+    <i class="bi bi-cart cart-icon"></i>
+  </a>
 
-  {{#each products}}
-    <div>
-      <h2>{{this.title}}</h2>
-      <p>Precio: {{this.price}}</p>
-      <p>Categoría: {{this.category}}</p>
-      <a href="/products/{{this.id}}">Ver detalles</a>
-    </div>
-  {{/each}}
-</ul>
+</div>
+<div class="container">
+  <div class="row">
+    {{#each products}}
+      <div class="card col-xl-4 col-md-6 col-sm-12">
+        <img src="{{img}}" alt="" class="card-img-top" />
+        <div class="card-body">
+          <h2 class="card-title">{{title}}</h2>
+          <p class="card-text">{{description}}</p>
+          <p class="card-text">Price: ${{price}}</p>
+          <form action="/api/carts/{{carritoID}}/product/{{id}}" method="POST">
+            <button class="btnMios" type="submit">Agregar al Carrito</button>
+          </form>
+        </div>
+      </div>
+    {{/each}}
+  </div>
+</div>
+
+<div class="container mt-3">
+  <div class="row text-center">
+    <p>Reckless Love ® World Of Restoration </p>
+  </div>
+</div>

@@ -38,6 +38,7 @@ class ProductManager {
       });
 
       await newProduct.save();
+      return newProduct;
     } catch (error) {
       console.log("Error al agregar producto", error);
       throw error;

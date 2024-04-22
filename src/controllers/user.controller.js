@@ -1,44 +1,43 @@
 const UserModel = require("../models/user.model.js");
+const CartModel = require("../models/cart.model.js");
 const jwt = require("jsonwebtoken");
+const { createHash, isValidPassword } = require("../utils/hashBcrypt.js");
+const UserDTO = require("../dto/user.dto.js");
 
 class UserController {
   async register(req, res) {
-    const { usuario, password } = req.body;
+    const { first_name, last_name, email, password, age } = req.body;
     try {
-      // Verificar si el usuario ya existe
-      const existeUsuario = await UserModel.findOne({ usuario });
+      const existeUsuario = await UserModel.findOne({ email });
       if (existeUsuario) {
         return res.status(400).send("El usuario ya existe");
       }
 
-      // Crear un nuevo usuario
-      const nuevoUsuario = new UserModel({ usuario, password });
-      await nuevoUsuario.save();
+      //Creo un nuevo carrito:
+      const nuevoCarrito = new CartModel();
+      await nuevoCarrito.save();
 
-      // Generar el token JWT
-      const token = jwt.sign(
-        { usuario: nuevoUsuario.usuario },
-        "reckless_secret",
-        {
-          expiresIn: "1h",
-        }
-      );
-
-      // Establecer el token como cookie
-      res.cookie("jwtToken", token, {
-        maxAge: 3600000, // 1 hora de expiración
-        httpOnly: true, // La cookie solo es accesible mediante HTTP(S)
+      const nuevoUsuario = new UserModel({
+        first_name,
+        last_name,
+        email,
+        cart: nuevoCarrito._id,
+        password: createHash(password),
+        age,
       });
 
-      // Configurar la sesión
-      req.session.login = true;
-      req.session.user = {
-        first_name: nuevoUsuario.first_name,
-        last_name: nuevoUsuario.last_name,
-        email: nuevoUsuario.email,
-      };
+      await nuevoUsuario.save();
 
-      res.redirect("/products");
+      const token = jwt.sign({ user: nuevoUsuario }, "coderhouse", {
+        expiresIn: "1h",
+      });
+
+      res.cookie("coderCookieToken", token, {
+        maxAge: 3600000,
+        httpOnly: true,
+      });
+
+      res.redirect("/api/users/profile");
     } catch (error) {
       console.error(error);
       res.status(500).send("Error interno del servidor");
@@ -46,72 +45,59 @@ class UserController {
   }
 
   async login(req, res) {
-    const { usuario, password } = req.body;
+    const { email, password } = req.body;
     try {
-      const usuarioEncontrado = await UserModel.findOne({ usuario });
+      const usuarioEncontrado = await UserModel.findOne({ email });
 
       if (!usuarioEncontrado) {
         return res.status(401).send("Usuario no válido");
       }
 
-      if (password !== usuarioEncontrado.password) {
+      const esValido = isValidPassword(password, usuarioEncontrado);
+      if (!esValido) {
         return res.status(401).send("Contraseña incorrecta");
       }
 
-      const token = jwt.sign(
-        { usuario: usuarioEncontrado.usuario },
-        "mi_secreto",
-        {
-          expiresIn: "1h",
-        }
-      );
+      const token = jwt.sign({ user: usuarioEncontrado }, "coderhouse", {
+        expiresIn: "1h",
+      });
 
-      res.cookie("jwtToken", token, {
+      res.cookie("coderCookieToken", token, {
         maxAge: 3600000,
         httpOnly: true,
       });
 
-      req.session.user = {
-        first_name: usuarioEncontrado.first_name,
-        last_name: usuarioEncontrado.last_name,
-        age: usuarioEncontrado.age,
-        email: usuarioEncontrado.email,
-      };
+      console.log("este es tu carrito bro:", usuarioEncontrado.cart);
 
-      req.session.login = true;
-
-      res.redirect("/products");
+      res.redirect("/api/users/profile");
     } catch (error) {
       console.error(error);
       res.status(500).send("Error interno del servidor");
     }
+  }
+
+  async profile(req, res) {
+    //Con DTO:
+    const userDto = new UserDTO(
+      req.user.first_name,
+      req.user.last_name,
+      req.user.role
+    );
+    const isAdmin = req.user.role === "admin";
+    res.render("profile", { user: userDto, isAdmin });
   }
 
   async logout(req, res) {
-    try {
-      res.clearCookie("jwtToken");
-      req.session.destroy((err) => {
-        if (err) {
-          console.error("Error al destruir la sesión:", err);
-          res.status(500).send("Error interno del servidor");
-          return;
-        }
-        console.log("Sesión de usuario destruida correctamente");
-        res.redirect("/login");
-      });
-    } catch (error) {
-      console.error("Error al cerrar sesión:", error);
-      res.status(500).send("Error interno del servidor");
-    }
+    res.clearCookie("coderCookieToken");
+    res.redirect("/login");
   }
 
   async admin(req, res) {
-    try {
-    } catch (error) {
-      console.error(error);
-      res.status(500).send("Error interno del servidor");
+    if (req.user.user.role !== "admin") {
+      return res.status(403).send("Acceso denegado");
     }
+    res.render("admin");
   }
 }
 
-module.exports = new UserController();
+module.exports = UserController;

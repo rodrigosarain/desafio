@@ -1,19 +1,153 @@
+body {
+  font-family: "Roboto", sans-serif;
+}
+
+/*HEADER*/
+
+.tamLogo {
+  width: 150px;
+}
+
+.fuentesNav {
+  font-size: 1.5rem;
+  padding: 10px;
+}
+
+nav li a {
+  text-transform: uppercase;
+  text-decoration: none;
+  margin: 15px;
+  color: gray;
+  padding: 0 15px;
+}
+
+a:hover {
+  background-color: #696969;
+  color: #fafafa;
+}
+
+/* PRODUCTOS */
+
+.tituloProductos {
+  background-color: #c1101a;
+  color: #fafafa;
+  text-align: center;
+  font-weight: bold;
+  text-transform: uppercase;
+  padding: 20px;
+}
+
+.tituloProductos h2 {
+  font-size: 35px;
+}
+
+/*CARDS*/
+
+.colorBtn {
+  background-color: #380a20;
+  color: #fafafa;
+  font-size: 18px;
+}
+
+.colorBtn:hover {
+  background-color: #570f32;
+  color: #fafafa;
+}
+
+/*Cards*/
+
+.card-img-top {
+  height: 200px;
+  object-fit: cover;
+  object-position: center top;
+}
+
+/* Login */
 h1 {
-  color: red;
   text-align: center;
 }
 
-.contenedorCards {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
+.formulario {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f2f2f2;
+  border-radius: 5px;
 }
 
-.card {
-  border: 1px solid #ccc;
-  border-radius: 2px;
-  margin: 10px;
+label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: bold;
+  color: #333;
+}
+
+.input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 20px;
+  border: none;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+.btnMios {
+  width: 100%;
   padding: 10px;
-  min-width: 200px;
+  background-color: #380a20;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.btnMios:hover {
+  background-color: #570f32;
+}
+
+i {
+  font-size: 35px;
+}
+
+h1-profile {
+  text-align: center;
+  margin-top: 20px;
+}
+.profile-card {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f2f2f2;
+  border-radius: 5px;
+  text-align: center;
+}
+.profile-card p {
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+.profile-card .btnMios {
+  display: block;
+  margin: 20px auto;
+  padding: 10px 20px;
+  background-color: #5f0d35;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+}
+.profile-card .btnMios:hover {
+  background-color: #570f32;
+}
+.profile-card a {
+  display: block;
+  margin-bottom: 10px;
+  color: #c1101a;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+p {
+  font-size: bold;
 }
