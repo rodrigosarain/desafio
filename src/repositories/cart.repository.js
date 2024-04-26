@@ -1,3 +1,4 @@
+const errorHandler = require("../middleware/errorHandler.js");
 const CartModel = require("../models/cart.model.js");
 
 class CartRepository {
@@ -7,7 +8,7 @@ class CartRepository {
       await nuevoCarrito.save();
       return nuevoCarrito;
     } catch (error) {
-      throw new Error("Error");
+      throw { code: errorHandler.EErrors.BD_ERROR };
     }
   }
 
@@ -15,12 +16,12 @@ class CartRepository {
     try {
       const cart = await CartModel.findById(cartId);
       if (!cart) {
-        console.log("Not found");
+        throw { code: errorHandler.EErrors.NotFoundError };
         return null;
       }
       return cart;
     } catch (error) {
-      throw new Error("Error");
+      throw { code: errorHandler.EErrors.BD_ERROR };
     }
   }
 
@@ -42,7 +43,7 @@ class CartRepository {
       await carrito.save();
       return carrito;
     } catch (error) {
-      throw new Error("Error");
+      throw { code: errorHandler.EErrors.BD_ERROR };
     }
   }
 
@@ -50,7 +51,7 @@ class CartRepository {
     try {
       const cart = await CartModel.findById(cartId);
       if (!cart) {
-        throw new Error("Carrito no encontrado");
+        throw { code: errorHandler.EErrors.NotFoundError };
       }
       cart.products = cart.products.filter(
         (item) => item.product._id.toString() !== productId
@@ -58,7 +59,7 @@ class CartRepository {
       await cart.save();
       return cart;
     } catch (error) {
-      throw new Error("Error");
+      throw { code: errorHandler.EErrors.BD_ERROR };
     }
   }
 
@@ -67,7 +68,7 @@ class CartRepository {
       const cart = await CartModel.findById(cartId);
 
       if (!cart) {
-        throw new Error("Carrito no encontrado");
+        throw { code: errorHandler.EErrors.NotFoundError };
       }
 
       cart.products = updatedProducts;
@@ -76,7 +77,7 @@ class CartRepository {
       await cart.save();
       return cart;
     } catch (error) {
-      throw new Error("Error");
+      throw { code: errorHandler.EErrors.BD_ERROR };
     }
   }
 
@@ -85,7 +86,7 @@ class CartRepository {
       const cart = await CartModel.findById(cartId);
 
       if (!cart) {
-        throw new Error("Carrito no encontrado");
+        throw { code: errorHandler.EErrors.NotFoundError };
       }
 
       const productIndex = cart.products.findIndex(
@@ -103,7 +104,7 @@ class CartRepository {
         throw new Error("Producto no encontrado en el carrito");
       }
     } catch (error) {
-      throw new Error("Error al actualizar las cantidades");
+      throw { code: errorHandler.EErrors.BD_ERROR };
     }
   }
 
@@ -116,12 +117,12 @@ class CartRepository {
       );
 
       if (!cart) {
-        throw new Error("Carrito no encontrado");
+        throw { code: errorHandler.EErrors.NotFoundError };
       }
 
       return cart;
     } catch (error) {
-      throw new Error("Error");
+      throw { code: errorHandler.EErrors.BD_ERROR };
     }
   }
 }

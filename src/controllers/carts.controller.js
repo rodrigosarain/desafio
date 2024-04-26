@@ -1,3 +1,4 @@
+const errorHandler = require("../middleware/errorHandler.js");
 const TicketModel = require("../models/ticket.model.js");
 const UserModel = require("../models/user.model.js");
 const CartRepository = require("../repositories/cart.repository.js");
@@ -12,7 +13,7 @@ class CartController {
       const nuevoCarrito = await cartRepository.crearCarrito();
       res.json(nuevoCarrito);
     } catch (error) {
-      res.status(500).send("Error");
+      throw { code: errorHandler.EErrors.BD_ERROR };
     }
   }
 
@@ -21,11 +22,11 @@ class CartController {
     try {
       const productos = await cartRepository.obtenerProductosDeCarrito(cartId);
       if (!productos) {
-        return res.status(404).json({ error: "Carrito no encontrado" });
+        throw { code: errorHandler.EErrors.NotFoundError };
       }
       res.json(productos);
     } catch (error) {
-      res.status(500).send("Error");
+      throw { code: errorHandler.EErrors.BD_ERROR };
     }
   }
 
@@ -39,7 +40,7 @@ class CartController {
 
       res.redirect(`/carts/${carritoID}`);
     } catch (error) {
-      res.status(500).send("Error");
+      throw { code: errorHandler.EErrors.BD_ERROR };
     }
   }
 
@@ -57,14 +58,13 @@ class CartController {
         updatedCart,
       });
     } catch (error) {
-      res.status(500).send("Error");
+      throw { code: errorHandler.EErrors.BD_ERROR };
     }
   }
 
   async actualizarProductosEnCarrito(req, res) {
     const cartId = req.params.cid;
     const updatedProducts = req.body;
-    // Debes enviar un arreglo de productos en el cuerpo de la solicitud
     try {
       const updatedCart = await cartRepository.actualizarProductosEnCarrito(
         cartId,
@@ -72,7 +72,7 @@ class CartController {
       );
       res.json(updatedCart);
     } catch (error) {
-      res.status(500).send("Error");
+      throw { code: errorHandler.EErrors.BD_ERROR };
     }
   }
 
@@ -93,7 +93,7 @@ class CartController {
         updatedCart,
       });
     } catch (error) {
-      res.status(500).send("Error al actualizar la cantidad de productos");
+      throw { code: errorHandler.EErrors.BD_ERROR };
     }
   }
 
@@ -109,7 +109,7 @@ class CartController {
         updatedCart,
       });
     } catch (error) {
-      res.status(500).send("Error");
+      throw { code: errorHandler.EErrors.BD_ERROR };
     }
   }
 
@@ -161,8 +161,7 @@ class CartController {
 
       res.status(200).json({ productosNoDisponibles });
     } catch (error) {
-      console.error("Error al procesar la compra:", error);
-      res.status(500).json({ error: "Error interno del servidor" });
+      throw { code: errorHandler.EErrors.BD_ERROR };
     }
   }
 }

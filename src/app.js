@@ -9,6 +9,8 @@ const path = require("path");
 const PUERTO = 8080;
 require("./database.js");
 
+const error_handler = require("./middleware/errorHandler.js");
+
 const productsRouter = require("./routes/products.router.js");
 const cartsRouter = require("./routes/carts.router.js");
 const viewsRouter = require("./routes/views.router.js");
@@ -51,6 +53,8 @@ app.use("/api/products", productsRouter);
 app.use("/api/carts", cartsRouter);
 app.use("/api/users", userRouter);
 app.use("/", viewsRouter);
+
+app.use(error_handler);
 
 const connectToDatabase = require("./database.js");
 connectToDatabase();

@@ -2,6 +2,7 @@ const ProductModel = require("../models/products.model.js");
 const CartRepository = require("../repositories/cart.repository.js");
 const cartRepository = new CartRepository();
 const authMiddleware = require("../middleware/authmiddleware.js");
+const { generarProductosFicticios } = require("../utils/productGenerator.js");
 
 class ViewsController {
   async renderProducts(req, res) {
@@ -12,8 +13,7 @@ class ViewsController {
       const cartId = req.user.cart.toString(); //carrito del usuario !!
       console.log("ermano q wea", cartId);
     } catch (error) {
-      console.error("Error al obtener los productos:", error);
-      res.status(500).json({ error: "Error interno del servidor" });
+      throw { code: errorHandler.EErrors.BD_ERROR };
     }
   }
 
@@ -26,8 +26,7 @@ class ViewsController {
 
         // Verificar si el cartId es válido
         if (!cartId) {
-          console.log("El usuario no tiene un carrito asociado.");
-          return res.status(404).json({ error: "Carrito no encontrado" });
+          throw { code: errorHandler.EErrors.NotFoundError };
         }
 
         // Obtener el carrito del usuario utilizando el cartId
@@ -35,8 +34,7 @@ class ViewsController {
 
         // Verificar si se encontró el carrito
         if (!carrito) {
-          console.log("No existe ese carrito con el id");
-          return res.status(404).json({ error: "Carrito no encontrado" });
+          throw { code: errorHandler.EErrors.NotFoundError };
         }
 
         // Calcular el total de la compra
@@ -64,8 +62,7 @@ class ViewsController {
         });
       });
     } catch (error) {
-      console.error("Error al obtener el carrito:", error);
-      res.status(500).json({ error: "Error interno del servidor" });
+      throw { code: errorHandler.EErrors.BD_ERROR };
     }
   }
 
@@ -92,8 +89,21 @@ class ViewsController {
     try {
       res.render("realtimeproducts");
     } catch (error) {
-      console.log("error en la vista real time", error);
-      res.status(500).json({ error: "Error interno del servidor" });
+      throw { code: errorHandler.EErrors.NotFoundError };
+    }
+  }
+
+  // Nuevo método para renderizar la vista de productos ficticios generados
+  async renderMockingProducts(req, res) {
+    try {
+      // Generar 100 productos ficticios
+      const productosFicticios = generarProductosFicticios(100);
+
+      // Renderizar la vista de productos ficticios con la información obtenida
+      res.render("mockingproducts", { productosFicticios });
+      console.log(productosFicticios);
+    } catch (error) {
+      throw { code: errorHandler.EErrors.BD_ERROR };
     }
   }
 }

@@ -40,7 +40,7 @@ class UserController {
       res.redirect("/api/users/profile");
     } catch (error) {
       console.error(error);
-      res.status(500).send("Error interno del servidor");
+      throw { code: errorHandler.EErrors.BD_ERROR };
     }
   }
 
@@ -72,7 +72,7 @@ class UserController {
       res.redirect("/api/users/profile");
     } catch (error) {
       console.error(error);
-      res.status(500).send("Error interno del servidor");
+      throw { code: errorHandler.EErrors.BD_ERROR };
     }
   }
 

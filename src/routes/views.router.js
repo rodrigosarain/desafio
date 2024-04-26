@@ -21,5 +21,7 @@ router.get(
   viewsController.renderRealTimeProducts
 );
 router.get("/chat", checkUserRole(["usuario"]), viewsController.renderChat);
+// Nueva ruta para el endpoint '/mockingproducts'
+router.get("/mockingproducts", viewsController.renderMockingProducts);
 
 module.exports = router;
