@@ -1,3 +1,4 @@
+const logger = require("../utils/logger.js");
 const errorHandler = require("../middleware/errorHandler.js");
 const ProductRepository = require("../repositories/product.repository.js");
 const productRepository = new ProductRepository();
@@ -9,15 +10,17 @@ class ProductController {
     const nuevoProducto = req.body;
     try {
       const resultado = await productRepository.agregarProducto(nuevoProducto);
-      res.json(resultado);
+      logger.info("Producto agregado:", resultado);
     } catch (error) {
       next({ code: errorHandler.EErrors.BD_ERROR });
+      logger.error("Error al agregar producto:", error);
     }
   }
 
   async getProducts(req, res, next) {
     const cartId = req.user.cart.toString();
     try {
+      req.logger.info("Rendering products");
       let { limit = 10, page = 1, sort, query } = req.query;
 
       const productos = await productRepository.obtenerProductos({
@@ -29,12 +32,13 @@ class ProductController {
 
       // Verificar si hay productos
       if (productos.docs.length === 0) {
-        console.log("No hay productos disponibles");
+        logger.warning("No hay productos disponibles");
       }
 
       res.json(productos);
     } catch (error) {
       next({ code: errorHandler.EErrors.BD_ERROR });
+      logger.error("Error al obtener productos:", error);
     }
   }
 
@@ -48,6 +52,7 @@ class ProductController {
       res.json(buscado);
     } catch (error) {
       next({ code: errorHandler.EErrors.BD_ERROR });
+      logger.error("Error al obtener producto por ID:", error);
     }
   }
 
@@ -61,8 +66,10 @@ class ProductController {
         productoActualizado
       );
       res.json(resultado);
+      logger.info("Producto actualizado:", resultado);
     } catch (error) {
       next({ code: errorHandler.EErrors.BD_ERROR });
+      logger.error("Error al actualizar producto:", error);
     }
   }
 
@@ -72,8 +79,10 @@ class ProductController {
       let respuesta = await productRepository.eliminarProducto(id);
 
       res.json(respuesta);
+      logger.info("Producto eliminado:", respuesta);
     } catch (error) {
       next({ code: errorHandler.EErrors.BD_ERROR });
+      logger.error("Error al eliminar producto:", error);
     }
   }
 }

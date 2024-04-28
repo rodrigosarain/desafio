@@ -4,6 +4,9 @@ const ViewsController = require("../controllers/views.controller.js");
 const viewsController = new ViewsController();
 const checkUserRole = require("../middleware/checkrole.js");
 const passport = require("passport");
+const addLogger = require("../utils/logger.js");
+
+router.use(addLogger);
 
 router.get(
   "/products",

@@ -6,6 +6,8 @@ const passport = require("passport");
 const initializePassport = require("./config/passport.config.js");
 const cors = require("cors");
 const path = require("path");
+
+const addLogger = require("./utils/logger.js");
 const PUERTO = 8080;
 require("./database.js");
 
@@ -23,6 +25,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(cors());
 
+app.use(addLogger);
 //Passport
 app.use(passport.initialize());
 initializePassport();
@@ -55,6 +58,15 @@ app.use("/api/users", userRouter);
 app.use("/", viewsRouter);
 
 app.use(error_handler);
+
+app.get("/loggerTest", (req, res) => {
+  req.logger.error("failed to load");
+  req.logger.debug("ejecting");
+  req.logger.info("INFORMATION");
+  req.logger.warning("Warning");
+
+  res.send("logs_test");
+});
 
 const connectToDatabase = require("./database.js");
 connectToDatabase();

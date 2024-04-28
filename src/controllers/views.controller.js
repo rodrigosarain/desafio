@@ -7,39 +7,35 @@ const { generarProductosFicticios } = require("../utils/productGenerator.js");
 class ViewsController {
   async renderProducts(req, res) {
     try {
+      req.logger.info("Rendering products");
+
       const products = await ProductModel.find();
       res.render("products", { products, session: req.session });
 
       const cartId = req.user.cart.toString(); //carrito del usuario !!
-      console.log("ermano q wea", cartId);
     } catch (error) {
+      req.logger.error("Failed to render products");
       throw { code: errorHandler.EErrors.BD_ERROR };
     }
   }
 
   async renderCart(req, res) {
     try {
-      // Utilizar el middleware de autenticación para verificar la autenticación del usuario
       authMiddleware(req, res, async () => {
-        // Obtener el cartId del usuario desde req.user
         const cartId = req.user.cartId;
 
-        // Verificar si el cartId es válido
         if (!cartId) {
           throw { code: errorHandler.EErrors.NotFoundError };
         }
 
-        // Obtener el carrito del usuario utilizando el cartId
         const carrito = await cartRepository.obtenerProductosDeCarrito(cartId);
 
-        // Verificar si se encontró el carrito
         if (!carrito) {
           throw { code: errorHandler.EErrors.NotFoundError };
         }
-
-        // Calcular el total de la compra
+        a;
         let totalCompra = 0;
-        // Mapear los productos en el carrito y calcular el precio total por producto
+
         const productosEnCarrito = carrito.products.map((item) => {
           const product = item.product.toObject();
           const quantity = item.quantity;
@@ -54,7 +50,6 @@ class ViewsController {
           };
         });
 
-        // Renderizar la vista del carrito con la información obtenida
         res.render("carts", {
           productos: productosEnCarrito,
           totalCompra,
@@ -62,6 +57,7 @@ class ViewsController {
         });
       });
     } catch (error) {
+      req.logger.error("Failed to render cart");
       throw { code: errorHandler.EErrors.BD_ERROR };
     }
   }
@@ -97,12 +93,14 @@ class ViewsController {
   async renderMockingProducts(req, res) {
     try {
       // Generar 100 productos ficticios
-      const productosFicticios = generarProductosFicticios(100);
+      req.logger.info("Rendering mocking products");
+      const productosFicticios = generarProductosFicticios(50);
 
       // Renderizar la vista de productos ficticios con la información obtenida
       res.render("mockingproducts", { productosFicticios });
-      console.log(productosFicticios);
+      req.logger.debug("Generated mocking products:", productosFicticios);
     } catch (error) {
+      req.logger.error("Failed to render mocking products");
       throw { code: errorHandler.EErrors.BD_ERROR };
     }
   }

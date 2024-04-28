@@ -2,8 +2,9 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const UserController = require("../controllers/user.controller.js");
-
 const userController = new UserController();
+const addLogger = require("../utils/logger.js");
+router.use(addLogger);
 
 router.post("/register", userController.register);
 router.post("/login", userController.login);

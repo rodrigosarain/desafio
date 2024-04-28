@@ -1,8 +1,8 @@
 const generarInfoError = (products) => {
   return ` Los datos estan incompletos o no son válidos. 
     Necesitamos recibir los siguientes datos: 
-    - title: String,se recibio ${products.title}
-    - price: String, se recibio ${products.price}
+    - title: se recibio ${products.title}
+    - price: se recibio ${products.price}
     `;
 };
 
