@@ -27,4 +27,9 @@ router.get("/chat", checkUserRole(["usuario"]), viewsController.renderChat);
 // Nueva ruta para el endpoint '/mockingproducts'
 router.get("/mockingproducts", viewsController.renderMockingProducts);
 
+router.get("/reset-password", viewsController.renderResetPassword);
+router.get("/password", viewsController.renderCambioPassword);
+router.get("/confirmacion-envio", viewsController.renderConfirmacion);
+router.get("/panel-premium", viewsController.renderPremium);
+
 module.exports = router;

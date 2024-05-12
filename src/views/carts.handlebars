@@ -1,12 +1,12 @@
 <h1 class="text-center">vaciarCarrito</h1>
 
 <div class="container">
-  {{#each productos}}
+  {{#each products}}
     <div class="card mb-3">
       <div class="card-body">
-        <h5 class="card-title">Producto: {{this.product.title}}</h5>
+        <h5 class="card-title">Producto: {{this.products.title}}</h5>
         <p class="card-text">Cantidad: {{this.quantity}}</p>
-        <p class="card-text">Precio: ${{this.product.totalPrice}}</p>
+        <p class="card-text">Precio: ${{this.products.totalPrice}}</p>
         <button
           onclick="eliminarProducto('{{this.cartId}}', '{{this.product._id}}')"
           class="btn btn-danger"

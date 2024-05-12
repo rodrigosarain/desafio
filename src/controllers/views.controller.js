@@ -104,6 +104,22 @@ class ViewsController {
       throw { code: errorHandler.EErrors.BD_ERROR };
     }
   }
+
+  async renderResetPassword(req, res) {
+    res.render("resetpassword");
+  }
+
+  async renderCambioPassword(req, res) {
+    res.render("passwordcambio");
+  }
+
+  async renderConfirmacion(req, res) {
+    res.render("confirmacion-envio");
+  }
+
+  async renderPremium(req, res) {
+    res.render("panel-premium");
+  }
 }
 
 module.exports = ViewsController;

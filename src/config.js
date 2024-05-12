@@ -1,3 +1,4 @@
+const logger = require("./utils/logger.js");
 require("dotenv").config();
 const config = {
   port: process.env.PORT,
