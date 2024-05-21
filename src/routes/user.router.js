@@ -22,6 +22,7 @@ router.get(
 
 router.post("/requestPasswordReset", userController.requestPasswordReset);
 router.post("/reset-password", userController.resetPassword);
+router.put("/premium/:uid", userController.cambiarRolPremium);
 
 router.get("/cambiar-rol-premium/:uid", userController.cambiarRolPremiumForm);
 router.post("/cambiar-rol-premium/:uid", userController.cambiarRolPremium);

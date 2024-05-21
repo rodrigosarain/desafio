@@ -1,0 +1,130 @@
+paths:
+  /api/products:
+    get:
+      summary: Obtiene todos los productos
+      tags:
+        - Productos
+      responses:
+        200:
+          description: Lista de productos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+    post:
+      summary: Crea un nuevo producto
+      tags:
+        - Productos
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Product"
+      responses:
+        201:
+          description: Producto creado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+
+  /api/products/{id}:
+    get:
+      summary: Obtiene un producto por ID
+      tags:
+        - Productos
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID del producto
+      responses:
+        200:
+          description: Producto obtenido
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        404:
+          description: Producto no encontrado
+    put:
+      summary: Actualiza un producto por ID
+      tags:
+        - Productos
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID del producto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Product"
+      responses:
+        200:
+          description: Producto actualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        404:
+          description: Producto no encontrado
+    delete:
+      summary: Elimina un producto por ID
+      tags:
+        - Productos
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID del producto
+      responses:
+        200:
+          description: Producto eliminado
+        404:
+          description: Producto no encontrado
+
+components:
+  schemas:
+    Product:
+      type: object
+      required:
+        - title
+        - description
+        - price
+        - code
+        - stock
+        - category
+        - status
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        img:
+          type: string
+        code:
+          type: string
+        stock:
+          type: number
+        category:
+          type: string
+        status:
+          type: boolean
+        thumbnails:
+          type: array
+          items:
+            type: string

@@ -6,6 +6,7 @@ const passport = require("passport");
 const initializePassport = require("./config/passport.config.js");
 const cors = require("cors");
 const path = require("path");
+const swagger = require("./swagger");
 
 const addLogger = require("./utils/logger.js");
 const PUERTO = 8080;
@@ -50,6 +51,7 @@ app.engine(
 );
 app.set("view engine", "handlebars");
 app.set("views", path.join(__dirname, "../src/views"));
+app.use("/api-docs", swagger.serve, swagger.setup);
 
 //Rutas:
 app.use("/api/products", productsRouter);
