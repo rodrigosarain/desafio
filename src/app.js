@@ -22,19 +22,14 @@ const userRouter = require("./routes/user.router.js");
 //Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-//app.use(express.static("./src/public"));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(cors());
-
 app.use(addLogger);
+
 //Passport
+app.use(cookieParser());
 app.use(passport.initialize());
 initializePassport();
-app.use(cookieParser());
-
-//AuthMiddleware
-const authMiddleware = require("./middleware/authmiddleware.js");
-app.use(authMiddleware);
 
 //Handlebars
 const Handlebars = require("handlebars");
@@ -49,9 +44,17 @@ app.engine(
     handlebars: allowInsecurePrototypeAccess(Handlebars),
   })
 );
+
 app.set("view engine", "handlebars");
 app.set("views", path.join(__dirname, "../src/views"));
 app.use("/api-docs", swagger.serve, swagger.setup);
+app.use((req, res, next) => {
+  passport.authenticate("jwt", { session: false }, (err, user) => {
+    res.locals.isAuthenticated = !!user;
+    req.user = user;
+    next();
+  })(req, res, next);
+});
 
 //Rutas:
 app.use("/api/products", productsRouter);

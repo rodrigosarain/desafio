@@ -12,22 +12,38 @@ class EmailManager {
     });
   }
 
-  async enviarCorreoCompra(email, first_name, ticket) {
+  async enviarCorreoCompra(email, first_name, ticket, products, total) {
     try {
+      const productsList = products
+        .map(
+          (product) =>
+            `<li>${product.name} - Cantidad: ${product.quantity}</li>`
+        )
+        .join("");
+
       const mailOptions = {
         from: "Reckless Love <rodriisaraiin@gmail.com>",
         to: email,
-        subject: "Your Ourder",
+        subject: "Your Order",
         html: `
-                    <h1>Order Confirmation</h1>
-                    <p>Thanks for your purchase!, ${first_name}!</p>
-                    <p>Your number order is: ${ticket}</p>
-                `,
+          <h1>Order Confirmation</h1>
+          <p>Thanks for your purchase, ${first_name}!</p>
+          <p>Your order number is: ${ticket}</p>
+          <h2>Order Details:</h2>
+          <ul>
+            ${productsList}
+          </ul>
+          <p>Total Amount: $${total}</p>
+          <p>Please send your transfer to alias reckless.pago and your proof to 055-888-AMORE.</p>
+        `,
       };
 
       await this.transporter.sendMail(mailOptions);
+
+      console.log(`Enviando correo a ${email} con ticket ${ticket}`);
     } catch (error) {
       console.error("Error al enviar el correo electrónico:", error);
+      throw new Error("Error al enviar el correo electrónico de compra");
     }
   }
 

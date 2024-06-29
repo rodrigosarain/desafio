@@ -45,7 +45,7 @@ class UserController {
       res.redirect("/api/users/profile");
     } catch (error) {
       console.error(error);
-      throw { code: errorHandler.EErrors.BD_ERROR };
+      console.error("Error al registrarse", error);
     }
   }
 
@@ -77,7 +77,7 @@ class UserController {
       res.redirect("/api/users/profile");
     } catch (error) {
       console.error(error);
-      throw { code: errorHandler.EErrors.BD_ERROR };
+      console.error("Error al logearse", error);
     }
   }
 
@@ -91,7 +91,12 @@ class UserController {
       );
       const isAdmin = req.user.role === "admin";
 
-      res.render("profile", { user: userDto, isPremium, isAdmin });
+      res.render("profile", {
+        user: userDto,
+        isPremium,
+        isAdmin,
+        isAuthenticated: true,
+      });
     } catch (error) {
       res.status(500).send("Error interno del servidor");
     }
@@ -122,7 +127,7 @@ class UserController {
 
       user.resetToken = {
         token: token,
-        expiresAt: new Date(Date.now() + 3600000), // 1 hora de duración
+        expiresAt: new Date(Date.now() + 3600000),
       };
       await user.save();
 
@@ -144,7 +149,6 @@ class UserController {
     const { email, password, token } = req.body;
 
     try {
-      // Buscar al usuario por su correo electrónico
       const user = await UserModel.findOne({ email });
       if (!user) {
         return res.render("passwordcambio", { error: "Usuario no encontrado" });
@@ -156,26 +160,20 @@ class UserController {
         });
       }
 
-      // Verificar si el token ha expirado
       const now = new Date();
       if (now > resetToken.expiresAt) {
-        // Redirigir a la página de generación de nuevo correo de restablecimiento
         return res.redirect("/passwordcambio");
       }
 
-      // Verificar si la nueva contraseña es igual a la anterior
       if (isValidPassword(password, user)) {
         return res.render("passwordcambio", {
           error: "La nueva contraseña no puede ser igual a la anterior",
         });
       }
 
-      // Actualizar la contraseña del usuario
       user.password = createHash(password);
-      user.resetToken = undefined; // Marcar el token como utilizado
-      await user.save();
+      user.resetToken = undefined;
 
-      // Renderizar la vista de confirmación de cambio de contraseña
       return res.redirect("/login");
     } catch (error) {
       console.error(error);

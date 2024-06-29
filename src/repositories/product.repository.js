@@ -1,8 +1,5 @@
-const errorHandler = require("../middleware/errorHandler.js");
-const { EErrors } = require("../services/dictinoary_err.js");
 const { generarInfoExist, generarInfoError } = require("../services/info.js");
 const CustomError = require("../services/custom_error.js");
-
 const ProductModel = require("../models/products.model.js");
 
 class ProductRepository {
@@ -18,18 +15,13 @@ class ProductRepository {
   }) {
     try {
       if (!title || !description || !price || !code || !stock || !category) {
-        throw { code: errorHandler.EErrors.TIPO_INVALIDO };
+        throw new Error("Faltan datos obligatorios para agregar el producto");
       }
 
       const existeProducto = await ProductModel.findOne({ code: code });
 
       if (existeProducto) {
-        throw CustomError.crearError({
-          nombre: "Ya existe",
-          causa: generarInfoExist(),
-          mensaje: "Ya existe el producto con esas caracteristicas",
-          codigo: EErrors.TIPO_INVALIDO,
-        });
+        throw new Error("Ya existe un producto con el código especificado");
       }
 
       const newProduct = new ProductModel({
@@ -48,12 +40,8 @@ class ProductRepository {
 
       return newProduct;
     } catch (error) {
-      throw CustomError.crearError({
-        nombre: "Usuario nuevo",
-        causa: generarInfoError({ title, price }),
-        mensaje: "Error al agregar el product",
-        codigo: EErrors.TIPO_INVALIDO,
-      });
+      console.error("Error al agregar los productos", error);
+      res.status(500).send("Error");
     }
   }
 
@@ -106,7 +94,8 @@ class ProductRepository {
           : null,
       };
     } catch (error) {
-      throw { code: errorHandler.EErrors.BD_ERROR };
+      console.error("Error al obtener los productos", error);
+      res.status(500).send("Error");
     }
   }
 
@@ -115,12 +104,18 @@ class ProductRepository {
       const producto = await ProductModel.findById(id);
 
       if (!producto) {
-        throw { code: errorHandler.EErrors.NotFoundError };
+        throw new Error("Producto no encontrado");
+      }
+
+      if (producto.status === undefined) {
+        producto.status = producto.stock > 0; // Asignamos un valor al status si no está definido
+        await producto.save();
       }
 
       return producto;
     } catch (error) {
-      throw { code: errorHandler.EErrors.BD_ERROR };
+      console.error("Error al obtener los productos por id", error);
+      res.status(500).send("Error");
     }
   }
 
@@ -131,12 +126,13 @@ class ProductRepository {
         productoActualizado
       );
       if (!updated) {
-        throw { code: errorHandler.EErrors.NotFoundError };
+        throw new Error("Producto no encontrado");
       }
       console.log("Successfully updated");
       return updated;
     } catch (error) {
-      throw { code: errorHandler.EErrors.BD_ERROR };
+      console.error("Error al actualizar los productos", error);
+      res.status(500).send("Error");
     }
   }
 
@@ -145,12 +141,13 @@ class ProductRepository {
       const deleted = await ProductModel.findByIdAndDelete(id);
 
       if (!deleted) {
-        throw { code: errorHandler.EErrors.NotFoundError };
+        throw new Error("Producto no encontrado");
       }
 
       return deleted;
     } catch (error) {
-      throw { code: errorHandler.EErrors.BD_ERROR };
+      console.error("Error al eliminar los productos", error);
+      res.status(500).send("Error");
     }
   }
 }

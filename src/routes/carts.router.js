@@ -15,8 +15,14 @@ router.delete("/:cid/product/:pid", cartController.eliminarProductoDeCarrito);
 router.put("/:cid", cartController.actualizarProductosEnCarrito);
 router.put("/:cid/product/:pid", cartController.actualizarCantidad);
 router.delete("/:cid", cartController.vaciarCarrito);
+
 router.post("/:cid/purchase", cartController.finalizarCompra);
 
 router.get("/carts/:cid", viewsController.renderCart);
+
+router.get("/checkout", (req, res) => {
+  const numTicket = req.query.numTicket;
+  res.render("checkout", { numTicket });
+});
 
 module.exports = router;

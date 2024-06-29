@@ -2,7 +2,6 @@ const ProductModel = require("../models/products.model.js");
 const CartRepository = require("../repositories/cart.repository.js");
 const cartRepository = new CartRepository();
 const authMiddleware = require("../middleware/authmiddleware.js");
-const { generarProductosFicticios } = require("../utils/productGenerator.js");
 
 class ViewsController {
   async renderProducts(req, res) {
@@ -10,30 +9,34 @@ class ViewsController {
       req.logger.info("Rendering products");
 
       const products = await ProductModel.find();
-      res.render("products", { products, session: req.session });
+      res.render("products", { products, session: req.user });
 
-      const cartId = req.user.cart.toString(); //carrito del usuario !!
+      const cartId = req.user.cart ? req.user.cart.toString() : null;
     } catch (error) {
       req.logger.error("Failed to render products");
-      throw { code: errorHandler.EErrors.BD_ERROR };
     }
   }
 
   async renderCart(req, res) {
     try {
       authMiddleware(req, res, async () => {
-        const cartId = req.user.cartId;
+        console.log("Usuario:", req.user); // Verifica qué datos tiene req.user
+        console.log("CartId:", req.user ? req.user.cart : "No existe cartId"); // Verifica si req.user.cart está definido
+
+        const cartId = req.user.cart;
 
         if (!cartId) {
-          throw { code: errorHandler.EErrors.NotFoundError };
+          console.log("El usuario no tiene un carrito asociado.");
+          return res.status(404).json({ error: "Carrito no encontrado" });
         }
 
         const carrito = await cartRepository.obtenerProductosDeCarrito(cartId);
 
         if (!carrito) {
-          throw { code: errorHandler.EErrors.NotFoundError };
+          console.log("No existe ese carrito con el id:", cartId);
+          return res.status(404).json({ error: "Carrito no encontrado" });
         }
-        a;
+
         let totalCompra = 0;
 
         const productosEnCarrito = carrito.products.map((item) => {
@@ -57,8 +60,9 @@ class ViewsController {
         });
       });
     } catch (error) {
-      req.logger.error("Failed to render cart");
-      throw { code: errorHandler.EErrors.BD_ERROR };
+      console.error("Error al obtener los detalles del producto:", error);
+      console.error("Error al obtener el carrito:", error);
+      res.status(500).json({ error: "Error interno del servidor" });
     }
   }
 
@@ -77,31 +81,12 @@ class ViewsController {
     res.render("profile", { user: req.session.user });
   }
 
-  async renderChat(req, res) {
-    res.render("chat");
-  }
-
   async renderRealTimeProducts(req, res) {
     try {
       res.render("realtimeproducts");
     } catch (error) {
-      throw { code: errorHandler.EErrors.NotFoundError };
-    }
-  }
-
-  // Nuevo método para renderizar la vista de productos ficticios generados
-  async renderMockingProducts(req, res) {
-    try {
-      // Generar 100 productos ficticios
-      req.logger.info("Rendering mocking products");
-      const productosFicticios = generarProductosFicticios(50);
-
-      // Renderizar la vista de productos ficticios con la información obtenida
-      res.render("mockingproducts", { productosFicticios });
-      req.logger.debug("Generated mocking products:", productosFicticios);
-    } catch (error) {
-      req.logger.error("Failed to render mocking products");
-      throw { code: errorHandler.EErrors.BD_ERROR };
+      console.log("error en la vista real time", error);
+      res.status(500).json({ error: "Error interno del servidor" });
     }
   }
 
@@ -119,6 +104,13 @@ class ViewsController {
 
   async renderPremium(req, res) {
     res.render("panel-premium");
+  }
+
+  async renderCheckout(req, res) {
+    const numTicket = req.query.numTicket; // Obtén el número de ticket desde la query
+
+    // Renderiza la vista checkout.handlebars y pasa el número de ticket como dato
+    res.render("checkout", { numTicket });
   }
 }
 

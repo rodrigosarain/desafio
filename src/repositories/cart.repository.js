@@ -1,4 +1,3 @@
-const errorHandler = require("../middleware/errorHandler.js");
 const CartModel = require("../models/cart.model.js");
 
 class CartRepository {
@@ -8,7 +7,9 @@ class CartRepository {
       await nuevoCarrito.save();
       return nuevoCarrito;
     } catch (error) {
-      throw { code: errorHandler.EErrors.BD_ERROR };
+      console.error("Error al crear un carrito:", error);
+      res.status(500).json({ error: "Error interno del servidor" });
+      res.status(500).send("Error");
     }
   }
 
@@ -16,12 +17,14 @@ class CartRepository {
     try {
       const cart = await CartModel.findById(cartId);
       if (!cart) {
-        throw { code: errorHandler.EErrors.NotFoundError };
+        console.error("cart not found", error);
         return null;
       }
       return cart;
     } catch (error) {
-      throw { code: errorHandler.EErrors.BD_ERROR };
+      console.error("Error al obtener el carrito:", error);
+      res.status(500).json({ error: "Error interno del servidor" });
+      res.status(500).send("Error");
     }
   }
 
@@ -43,7 +46,9 @@ class CartRepository {
       await carrito.save();
       return carrito;
     } catch (error) {
-      throw { code: errorHandler.EErrors.BD_ERROR };
+      console.error("Error al agregar producto al carrito:", error);
+      res.status(500).json({ error: "Error interno del servidor" });
+      res.status(500).send("Error");
     }
   }
 
@@ -51,7 +56,7 @@ class CartRepository {
     try {
       const cart = await CartModel.findById(cartId);
       if (!cart) {
-        throw { code: errorHandler.EErrors.NotFoundError };
+        console.error("cart not found", error);
       }
       cart.products = cart.products.filter(
         (item) => item.product._id.toString() !== productId
@@ -59,7 +64,9 @@ class CartRepository {
       await cart.save();
       return cart;
     } catch (error) {
-      throw { code: errorHandler.EErrors.BD_ERROR };
+      console.error("Error al eliminar producto del carrito:", error);
+      res.status(500).json({ error: "Error interno del servidor" });
+      res.status(500).send("Error");
     }
   }
 
@@ -68,7 +75,7 @@ class CartRepository {
       const cart = await CartModel.findById(cartId);
 
       if (!cart) {
-        throw { code: errorHandler.EErrors.NotFoundError };
+        console.error("cart not found upload", error);
       }
 
       cart.products = updatedProducts;
@@ -77,7 +84,7 @@ class CartRepository {
       await cart.save();
       return cart;
     } catch (error) {
-      throw { code: errorHandler.EErrors.BD_ERROR };
+      res.status(500).send("Error");
     }
   }
 
@@ -86,7 +93,7 @@ class CartRepository {
       const cart = await CartModel.findById(cartId);
 
       if (!cart) {
-        throw { code: errorHandler.EErrors.NotFoundError };
+        console.error("cart not found upload cant", error);
       }
 
       const productIndex = cart.products.findIndex(
@@ -104,7 +111,7 @@ class CartRepository {
         throw new Error("Producto no encontrado en el carrito");
       }
     } catch (error) {
-      throw { code: errorHandler.EErrors.BD_ERROR };
+      res.status(500).send("Error");
     }
   }
 
@@ -117,12 +124,12 @@ class CartRepository {
       );
 
       if (!cart) {
-        throw { code: errorHandler.EErrors.NotFoundError };
+        console.error("cart not found", error);
       }
 
       return cart;
     } catch (error) {
-      throw { code: errorHandler.EErrors.BD_ERROR };
+      res.status(500).send("Error");
     }
   }
 }
