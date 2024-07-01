@@ -107,13 +107,6 @@ class UserController {
     res.redirect("/login");
   }
 
-  async admin(req, res) {
-    if (req.user.user.role !== "admin") {
-      return res.status(403).send("Acceso denegado");
-    }
-    res.render("admin");
-  }
-
   async requestPasswordReset(req, res) {
     const { email } = req.body;
 

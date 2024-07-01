@@ -9,11 +9,11 @@ class ViewsController {
       req.logger.info("Rendering products");
 
       const products = await ProductModel.find();
-      res.render("products", { products, session: req.user });
-
       const cartId = req.user.cart ? req.user.cart.toString() : null;
+
+      res.render("products", { products, session: req.user, cartId });
     } catch (error) {
-      req.logger.error("Failed to render products");
+      req.logger.error("Failed to render products", error);
     }
   }
 
@@ -103,6 +103,10 @@ class ViewsController {
   }
 
   async renderPremium(req, res) {
+    res.render("premium");
+  }
+
+  async renderPanelPremium(req, res) {
     res.render("panel-premium");
   }
 
@@ -111,6 +115,10 @@ class ViewsController {
 
     // Renderiza la vista checkout.handlebars y pasa el número de ticket como dato
     res.render("checkout", { numTicket });
+  }
+
+  async renderHome(req, res) {
+    res.render("home");
   }
 }
 

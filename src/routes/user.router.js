@@ -14,15 +14,10 @@ router.get(
   userController.profile
 );
 router.post("/logout", userController.logout.bind(userController));
-router.get(
-  "/admin",
-  passport.authenticate("jwt", { session: false }),
-  userController.admin
-);
 
 router.post("/requestPasswordReset", userController.requestPasswordReset);
 router.post("/reset-password", userController.resetPassword);
-router.put("/premium/:uid", userController.cambiarRolPremium);
+router.put("/premium/:userId", userController.cambiarRolPremium);
 
 router.get("/cambiar-rol-premium/:uid", userController.cambiarRolPremiumForm);
 router.post("/cambiar-rol-premium/:uid", userController.cambiarRolPremium);

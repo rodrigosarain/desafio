@@ -1,4 +1,15 @@
-<!-- premium.handlebars -->
-<h1>Cambio de Rol Confirmado</h1>
-<p>Se ha cambiado el rol del usuario a Premium.</p>
-<a href="/profile" class="btnMios">Volver a Mi Perfil</a>
+<h1>Conviértete en premium</h1>
+
+<form id="premiumForm">
+  <input type="hidden" id="userId" value="{{user._id}}" />
+  <button id="cambioPremium" class="btn btn-success mt-3">
+    cambiate a premium
+  </button>
+</form>
+
+<!-- Incluir Socket.IO -->
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.js"
+></script>
+<!-- Incluir tu script personalizado -->
+<script src="/js/premium.js"></script>

@@ -3,7 +3,7 @@
 <div class="profile-card">
   <p>Bienvenido, {{user.nombre}} {{user.apellido}}!</p>
   <p>Rol: {{user.role}}</p>
-
+  <a class="btnMios" href="/Home">Home</a>
   <form action="/api/users/logout" method="POST">
     <button class="btnMios" type="submit">Logout</button>
   </form>
@@ -12,10 +12,10 @@
     <a class="btnMios" href="/realtimeproducts">Modificar Productos</a>
   {{else}}
     {{#if this.isPremium}}
-      <a class="btnMios" href="/realtimeproducts">Panel Premium</a>
+      <a class="btnMios" href="/panel-premium">Panel Premium</a>
     {{/if}}
     <a class="btnMios" href="/products">Tienda</a>
   {{/if}}
-  <a href="/cambiar-rol-premium/{{user._id}}" class="btnMios">Cambiar a Premium</a>
+  <a href="/premium" class="btnMios">Cambiar a Premium</a>
 
 </div>

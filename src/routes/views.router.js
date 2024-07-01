@@ -27,8 +27,11 @@ router.get(
 router.get("/reset-password", viewsController.renderResetPassword);
 router.get("/password", viewsController.renderCambioPassword);
 router.get("/confirmacion-envio", viewsController.renderConfirmacion);
-router.get("/panel-premium", viewsController.renderPremium);
+router.get("/premium", viewsController.renderPremium);
+router.get("/panel-premium", viewsController.renderPanelPremium);
 
 router.get("/checkout", viewsController.renderCheckout);
+
+router.get("/Home", viewsController.renderHome);
 
 module.exports = router;
