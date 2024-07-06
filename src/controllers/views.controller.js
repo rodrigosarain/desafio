@@ -2,6 +2,7 @@ const ProductModel = require("../models/products.model.js");
 const CartRepository = require("../repositories/cart.repository.js");
 const cartRepository = new CartRepository();
 const authMiddleware = require("../middleware/authmiddleware.js");
+const UserModel = require("../models/user.model.js");
 
 class ViewsController {
   async renderProducts(req, res) {
@@ -103,7 +104,17 @@ class ViewsController {
   }
 
   async renderPremium(req, res) {
-    res.render("premium");
+    try {
+      //ID del usuario desde req.user
+      const userId = req.user._id;
+      console.log(userId);
+
+      // Renderiza la vista premium y pasa el usuario como dato
+      res.render("premium", { user: req.user });
+    } catch (error) {
+      console.error("Error al renderizar la vista premium:", error);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
   }
 
   async renderPanelPremium(req, res) {
@@ -111,7 +122,7 @@ class ViewsController {
   }
 
   async renderCheckout(req, res) {
-    const numTicket = req.query.numTicket; // Obtén el número de ticket desde la query
+    const numTicket = req.query.numTicket;
 
     // Renderiza la vista checkout.handlebars y pasa el número de ticket como dato
     res.render("checkout", { numTicket });
@@ -119,6 +130,18 @@ class ViewsController {
 
   async renderHome(req, res) {
     res.render("home");
+  }
+
+  async renderAdmin(req, res) {
+    try {
+      const users = await UserModel.find({}, "first_name last_name email role");
+      // console.log(users);
+
+      res.render("admin", { users });
+    } catch (error) {
+      console.error("Error al renderizar la vista admin:", error);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
   }
 }
 

@@ -40,6 +40,10 @@ const userSchema = mongoose.Schema({
     token: String,
     expiresAt: Date,
   },
+  last_login: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 const UserModel = mongoose.model("user", userSchema);

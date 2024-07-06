@@ -7,6 +7,8 @@ const initializePassport = require("./config/passport.config.js");
 const cors = require("cors");
 const path = require("path");
 const swagger = require("./swagger");
+const handlebarsHelpers = require("handlebars-helpers");
+const flash = require("connect-flash");
 
 const addLogger = require("./utils/logger.js");
 const PUERTO = 8080;
@@ -26,6 +28,8 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(cors());
 app.use(addLogger);
 
+app.use(flash());
+
 //Passport
 app.use(cookieParser());
 app.use(passport.initialize());
@@ -33,6 +37,7 @@ initializePassport();
 
 //Handlebars
 const Handlebars = require("handlebars");
+const helpers = handlebarsHelpers();
 const {
   allowInsecurePrototypeAccess,
 } = require("@handlebars/allow-prototype-access");
@@ -42,6 +47,7 @@ app.engine(
     defaultLayout: "main",
     extname: ".handlebars",
     handlebars: allowInsecurePrototypeAccess(Handlebars),
+    helpers: helpers,
   })
 );
 

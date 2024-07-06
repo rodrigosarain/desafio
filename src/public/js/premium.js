@@ -22,24 +22,24 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
   // Manejar actualizaciones en tiempo real de la lista de productos
-  //   socket.on("productos", (productos) => {
-  //     const productList = document.getElementById("userProductsList");
-  //     if (productList) {
-  //       productList.innerHTML = "";
-  //       productos.forEach((product) => {
-  //         const newItem = document.createElement("li");
-  //         newItem.innerHTML = `
-  //             <h3>${product.title}</h3>
-  //             <p>${product.description}</p>
-  //             <p>Precio: $${product.price}</p>
-  //             <form class="deleteForm" data-product-id="${product._id}">
-  //               <button type="button" class="deleteButton">Eliminar</button>
-  //             </form>
-  //           `;
-  //         productList.appendChild(newItem);
-  //       });
-  //     }
-  //   });
+  socket.on("productos", (productos) => {
+    const productList = document.getElementById("userProductsList");
+    if (productList) {
+      productList.innerHTML = "";
+      productos.forEach((product) => {
+        const newItem = document.createElement("li");
+        newItem.innerHTML = `
+              <h3>${product.title}</h3>
+              <p>${product.description}</p>
+              <p>Precio: $${product.price}</p>
+              <form class="deleteForm" data-product-id="${product._id}">
+                <button type="button" class="deleteButton">Eliminar</button>
+              </form>
+            `;
+        productList.appendChild(newItem);
+      });
+    }
+  });
 
   // Manejar la eliminación de productos
   document
@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
   premiumForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    const userId = document.getElementById("userId").value;
+    const userId = document.getElementById("uid").value; // Obtén el _id del usuario
 
     try {
       const response = await fetch(`/api/users/premium/${userId}`, {
@@ -70,12 +70,12 @@ document.addEventListener("DOMContentLoaded", () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ userId }),
+        body: JSON.stringify({ userId }), // Enviar userId en el cuerpo de la solicitud
       });
 
       if (response.ok) {
         alert("Cambio a premium completado");
-        window.location.href = "/panel-premium"; // Redirigir al panel premium
+        window.location.href = "/panel-premium";
       } else {
         const errorMessage = await response.text();
         throw new Error(errorMessage);

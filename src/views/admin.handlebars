@@ -1,0 +1,38 @@
+<!-- admin.handlebars -->
+
+<h1>Administrar Usuarios</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Nombre</th>
+      <th>Apellido</th>
+      <th>Email</th>
+      <th>Rol</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each users}}
+    <tr>
+      <td>{{this.first_name}}</td>
+      <td>{{this.last_name}}</td>
+      <td>{{this.email}}</td>
+      <td>{{this.role}}</td>
+      <td>
+        <form action="/api/users/{{this._id}}/cambiar-rol" method="POST">
+          <select name="nuevoRol">
+            <option value="admin" {{#if (eq this.role 'admin')}}selected{{/if}}>Admin</option>
+            <option value="premium" {{#if (eq this.role 'premium')}}selected{{/if}}>Premium</option>
+            <option value="usuario" {{#if (eq this.role 'usuario')}}selected{{/if}}>Usuario</option>
+          </select>
+          <button type="submit">Cambiar Rol</button>
+          <button id="eliminar" data-user-id="{{this._id}}">Eliminar</button>
+        </form>
+      </td>
+    </tr>
+    {{/each}}
+  </tbody>
+</table>
+<a href="/register">Registrar nuevo usuario</a>
+<script src="/js/admin.js"></script>

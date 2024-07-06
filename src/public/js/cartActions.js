@@ -56,19 +56,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
           );
 
-          // if (!response.ok) {
-          //   if (response.status === 429) {
-          //     throw new Error(
-          //       "Demasiadas solicitudes. Inténtelo de nuevo más tarde."
-          //     );
-          //   } else {
-          //     throw new Error(
-          //       "Error al procesar la compra. Código de estado HTTP: " +
-          //         response.status
-          //     );
-          //   }
-          // }
-
           const data = await response.json();
 
           // Verifica si la respuesta contiene el número de ticket
@@ -82,7 +69,6 @@ document.addEventListener("DOMContentLoaded", () => {
           window.location.href = `/checkout?numTicket=${numTicket}`;
         } catch (error) {
           console.error("Error al procesar la compra:", error.message);
-          alert("Error al procesar la compra. Inténtelo de nuevo más tarde.");
         }
       },
       { once: true }

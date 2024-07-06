@@ -9,6 +9,8 @@ const { generateResetToken } = require("../utils/tokenreset.js");
 const EmailManager = require("../services/email.js");
 const emailManager = new EmailManager();
 
+const moment = require("moment");
+
 class UserController {
   async register(req, res) {
     const { first_name, last_name, email, password, age } = req.body;
@@ -63,6 +65,9 @@ class UserController {
         return res.status(401).send("Contraseña incorrecta");
       }
 
+      usuarioEncontrado.last_login = Date.now();
+      await usuarioEncontrado.save();
+
       const token = jwt.sign({ user: usuarioEncontrado }, "coderhouse", {
         expiresIn: "1h",
       });
@@ -71,8 +76,6 @@ class UserController {
         maxAge: 3600000,
         httpOnly: true,
       });
-
-      console.log("este es tu carrito bro:", usuarioEncontrado.cart);
 
       res.redirect("/api/users/profile");
     } catch (error) {
@@ -91,12 +94,7 @@ class UserController {
       );
       const isAdmin = req.user.role === "admin";
 
-      res.render("profile", {
-        user: userDto,
-        isPremium,
-        isAdmin,
-        isAuthenticated: true,
-      });
+      res.render("profile", { user: userDto, isPremium, isAdmin });
     } catch (error) {
       res.status(500).send("Error interno del servidor");
     }
@@ -105,6 +103,13 @@ class UserController {
   async logout(req, res) {
     res.clearCookie("coderCookieToken");
     res.redirect("/login");
+  }
+
+  async admin(req, res) {
+    if (req.user.user.role !== "admin") {
+      return res.status(403).send("Acceso denegado");
+    }
+    res.render("admin");
   }
 
   async requestPasswordReset(req, res) {
@@ -143,36 +148,51 @@ class UserController {
 
     try {
       const user = await UserModel.findOne({ email });
+
+      // Verificar si el usuario existe
       if (!user) {
         return res.render("passwordcambio", { error: "Usuario no encontrado" });
       }
+
       const resetToken = user.resetToken;
+
+      // Verificar si el token de restablecimiento es válido
       if (!resetToken || resetToken.token !== token) {
         return res.render("passwordreset", {
           error: "El token de restablecimiento de contraseña es inválido",
         });
       }
 
+      // Verificar si el token ha expirado
       const now = new Date();
       if (now > resetToken.expiresAt) {
         return res.redirect("/passwordcambio");
       }
 
+      // Verificar si la nueva contraseña no es igual a la anterior
       if (isValidPassword(password, user)) {
         return res.render("passwordcambio", {
           error: "La nueva contraseña no puede ser igual a la anterior",
         });
       }
 
+      // Hash de la nueva contraseña y actualización del usuario
       user.password = createHash(password);
-      user.resetToken = undefined;
+      user.resetToken = undefined; // Limpiar el token de restablecimiento
 
+      // Guardar el usuario actualizado en la base de datos
+      await user.save();
+
+      // Redirigir al usuario a la página de login
       return res.redirect("/login");
     } catch (error) {
-      console.error(error);
-      return res
-        .status(500)
-        .render("passwordreset", { error: "Error interno del servidor" });
+      console.error(
+        "Error al procesar el restablecimiento de contraseña:",
+        error
+      );
+      return res.status(500).render("passwordreset", {
+        error: "Error interno del servidor al restablecer la contraseña",
+      });
     }
   }
 
@@ -206,6 +226,80 @@ class UserController {
         return res.status(404).json({ message: "Usuario no encontrado" });
       }
       res.render("premium", { user });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Error interno del servidor" });
+    }
+  }
+
+  async getAllUsers(req, res) {
+    try {
+      const users = await UserModel.find({}, "first_name last_name email role");
+      res.json(users);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Error interno del servidor" });
+    }
+  }
+
+  async deleteInactiveUsers(req, res) {
+    const cutoffDate = moment().subtract(2, "days").toDate(); // Cambiar a 2 días para producción
+
+    try {
+      const inactiveUsers = await UserModel.find({
+        last_login: { $lt: cutoffDate },
+      });
+
+      for (let user of inactiveUsers) {
+        await emailManager.sendDeletionEmail(user.email, user.first_name); // Enviar correo de eliminación
+        await UserModel.deleteOne({ _id: user._id }); // Eliminar usuario
+      }
+
+      res.json({
+        message: `${inactiveUsers.length} usuarios eliminados por inactividad`,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Error interno del servidor" });
+    }
+  }
+
+  async deleteUser(req, res) {
+    try {
+      const { uid } = req.params;
+      const user = await UserModel.findByIdAndDelete(uid);
+      if (!user) {
+        return res.status(404).json({ message: "Usuario no encontrado" });
+      }
+      res.json({ message: "Usuario eliminado" });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Error interno del servidor" });
+    }
+  }
+
+  async cambiarRol(req, res) {
+    try {
+      const { uid } = req.params;
+      const { nuevoRol } = req.body;
+
+      const user = await UserModel.findById(uid);
+      if (!user) {
+        return res.status(404).json({ message: "Usuario no encontrado" });
+      }
+
+      const rolesPermitidos = ["usuario", "premium", "admin"];
+      if (!rolesPermitidos.includes(nuevoRol)) {
+        return res.status(400).json({ message: "Rol no válido" });
+      }
+
+      const actualizado = await UserModel.findByIdAndUpdate(
+        uid,
+        { role: nuevoRol },
+        { new: true }
+      );
+
+      res.json(actualizado);
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: "Error interno del servidor" });

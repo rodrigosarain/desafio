@@ -209,6 +209,8 @@ class CartController {
         ticket.amount
       );
 
+      await cartRepository.vaciarCarrito(cartId);
+
       // Responder al cliente con el número de ticket
       res.json({ numTicket: ticket._id });
     } catch (error) {

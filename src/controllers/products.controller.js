@@ -11,7 +11,7 @@ class ProductController {
       logger.info("Producto agregado:", resultado);
       res.status(201).json(resultado);
     } catch (error) {
-      logger.error("Error al agregar producto:", error);
+      console.log("Error al agregar producto:", error);
     }
   }
 

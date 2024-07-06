@@ -50,7 +50,7 @@ class EmailManager {
   async enviarCorreoRestablecimiento(email, first_name, token) {
     try {
       const mailOptions = {
-        from: "rodriisaraiin@gmail.com",
+        from: "Reckless Love <rodriisaraiin@gmail.com>",
         to: email,
         subject: "Restablecimiento de Contraseña",
         html: `
@@ -68,6 +68,21 @@ class EmailManager {
     } catch (error) {
       console.error("Error al enviar correo electrónico:", error);
       throw new Error("Error al enviar correo electrónico");
+    }
+  }
+
+  async sendDeletionEmail(email, firstName) {
+    const mailOptions = {
+      from: "Reckless Love <rodriisaraiin@gmail.com>",
+      to: email,
+      subject: "Cuenta eliminada por inactividad",
+      text: `Hola ${firstName},\n\nTu cuenta ha sido eliminada debido a inactividad.\n\nSaludos,\nTu equipo`,
+    };
+
+    try {
+      await this.transporter.sendMail(mailOptions);
+    } catch (error) {
+      console.error("Error al enviar el correo:", error);
     }
   }
 }

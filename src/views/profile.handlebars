@@ -10,12 +10,15 @@
 
   {{#if this.isAdmin}}
     <a class="btnMios" href="/realtimeproducts">Modificar Productos</a>
+    <a href="/admin" class="btnMios">Panel principal</a>
   {{else}}
     {{#if this.isPremium}}
       <a class="btnMios" href="/panel-premium">Panel Premium</a>
     {{/if}}
     <a class="btnMios" href="/products">Tienda</a>
   {{/if}}
-  <a href="/premium" class="btnMios">Cambiar a Premium</a>
+  {{#unless this.isPremium}}
+    <a href="/premium" class="btnMios">Cambiar a Premium</a>
+  {{/unless}}
 
 </div>

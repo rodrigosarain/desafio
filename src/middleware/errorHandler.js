@@ -1,7 +1,7 @@
 const { EErrors } = require("../services/dictinoary_err.js");
 
 const errorHandler = (error, req, res, next) => {
-  console.log("Error pibe q paso:", error.causa); // Depuración
+  console.log("Error pibe q paso:", error); // Depuración
 
   switch (error.code) {
     case EErrors.TIPO_INVALIDO:
